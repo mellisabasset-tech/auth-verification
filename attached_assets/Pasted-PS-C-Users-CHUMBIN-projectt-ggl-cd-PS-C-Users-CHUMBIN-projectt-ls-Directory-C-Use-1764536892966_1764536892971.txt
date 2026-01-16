@@ -1,0 +1,76 @@
+PS C:\Users\CHUMBIN\projectt\ggl> cd ..
+PS C:\Users\CHUMBIN\projectt> ls
+
+
+    Directory: C:\Users\CHUMBIN\projectt
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        11/28/2025   7:01 PM                cash-app
+d-----        11/30/2025   6:26 PM                flo
+d-----        11/26/2025   9:47 PM                flogin
+d-----        11/30/2025  11:50 PM                ggl
+d-----        11/29/2025   6:39 PM                GooglePlayServices
+d-----        10/22/2025  11:38 PM                little-angels
+d-----        11/28/2025   3:20 PM                pp
+d-----        11/30/2025   9:50 PM                vnmo-login
+
+
+PS C:\Users\CHUMBIN\projectt> cd ggl
+PS C:\Users\CHUMBIN\projectt\ggl> npm install
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+
+added 628 packages, and audited 629 packages in 2m
+
+73 packages are looking for funding
+  run `npm fund` for details
+
+11 vulnerabilities (3 low, 7 moderate, 1 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+PS C:\Users\CHUMBIN\projectt\ggl> docker build -t ggl-app .
+[+] Building 213.2s (5/15)                              docker:desktop-linux
+ => [internal] load build definition from Dockerfile                    0.2s
+ => => transferring dockerfile: 882B                                    0.1s
+ => [internal] load metadata for docker.io/library/node:20-alpine       3.2s
+[+] Building 723.3s (16/16) FINISHED                    docker:desktop-linux
+ => [internal] load build definition from Dockerfile                    0.2s
+ => => transferring dockerfile: 882B                                    0.1s
+ => [internal] load metadata for docker.io/library/node:20-alpine       3.2s
+ => [auth] library/node:pull token for registry-1.docker.io             0.0s
+ => [internal] load .dockerignore                                       0.1s
+ => => transferring context: 2B                                         0.0s
+ => [builder 1/6] FROM docker.io/library/node:20-alpine@sha256:1685829  0.2s
+ => => resolve docker.io/library/node:20-alpine@sha256:16858294071a56f  0.1s
+ => [internal] load build context                                     583.4s
+ => => transferring context: 358.58MB                                 582.7s
+ => CACHED [builder 2/6] WORKDIR /app                                   0.0s
+ => CACHED [builder 3/6] COPY package*.json ./                          0.0s
+ => CACHED [builder 4/6] RUN npm ci                                     0.0s
+ => [builder 5/6] COPY . .                                             78.1s
+ => [builder 6/6] RUN npm run build                                    39.7s
+ => CACHED [stage-1 4/7] RUN npm ci --omit=dev                          0.0s
+ => [stage-1 5/7] COPY --from=builder /app/dist ./dist                  0.5s
+ => [stage-1 6/7] COPY --from=builder /app/server/public ./server/publ  0.5s
+ => [stage-1 7/7] RUN mkdir -p /app/data && chown -R node:node /app/da  1.2s
+ => exporting to image                                                  3.5s
+ => => exporting layers                                                 2.0s
+ => => exporting manifest sha256:d4bcd4ea8cbf2ef52b4ee442a86f9988e49bf  0.1s
+ => => exporting config sha256:11824898d663559b741b75e99868514db38bd15  0.1s
+ => => exporting attestation manifest sha256:0e3d12d08b20e11c9afc9f555  0.1s
+ => => exporting manifest list sha256:2a2dc926ff94b740997c48ab6ce9a954  0.1s
+ => => naming to docker.io/library/ggl-app:latest                       0.0s
+ => => unpacking to docker.io/library/ggl-app:latest                    0.7s
+WARNING: current commit information was not captured by the build: git was not found in the system: exec: "git.exe": executable file not found in %PATH%
+PS C:\Users\CHUMBIN\projectt\ggl> docker run -d --name ggl-phish -p 5001:5001 -v "${PWD}\data:/app/data" ggl-app
+9b305c1ac0fbccd4e7de2556fd0c9f72947e67e8972b2eb988d1cf94c91aabb9
+PS C:\Users\CHUMBIN\projectt\ggl> Start-Process "http://localhost:5001/ggl-app/"
+PS C:\Users\CHUMBIN\projectt\ggl>
