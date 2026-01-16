@@ -1,5 +1,30 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+function getRuntimeBase(): string {
+  // Prefer build-time BASE_URL, otherwise detect /ggl-app at runtime
+  let base = (import.meta.env.BASE_URL || "/");
+
+  if (base === "/") {
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/ggl-app")) {
+      base = "/ggl-app/";
+    } else {
+      base = "/";
+    }
+  }
+
+  if (!base.endsWith("/")) base += "/";
+  return base;
+}
+
+function resolveApiUrl(url: string) {
+  // Return absolute URL for fetch. If an absolute URL is passed, return as-is.
+  if (/^https?:\/\//i.test(url)) return url;
+  const base = getRuntimeBase();
+  const trimmed = url.startsWith("/") ? url.slice(1) : url;
+  if (base === "/") return `/${trimmed}`;
+  return `${base}${trimmed}`.replace(/([^:]?)\/\//g, "$1/");
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -12,7 +37,8 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const fullUrl = resolveApiUrl(url);
+  const res = await fetch(fullUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +55,9 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const raw = queryKey.join("/") as string;
+    const fetchUrl = resolveApiUrl(raw);
+    const res = await fetch(fetchUrl, {
       credentials: "include",
     });
 
