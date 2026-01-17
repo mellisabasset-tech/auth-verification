@@ -9,19 +9,8 @@ import NotFound from "@/pages/not-found";
 import GmailNotification from "./components/GmailNotification";
 
 function Router() {
-  // Compute router base: prefer Vite's BASE_URL, fall back to detecting
-  // a /ggl-app prefix in the current location. This makes the app work
-  // when served at the root (`/`) or behind a subpath like `/ggl-app`.
-  let base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
-  if (base === "") base = "/";
-
-  if (
-    base === "/" &&
-    typeof window !== "undefined" &&
-    window.location.pathname.startsWith("/ggl-app")
-  ) {
-    base = "/ggl-app";
-  }
+  // Always use root path for Netlify
+  const base = "/";
 
   return (
     <WouterRouter base={base}>

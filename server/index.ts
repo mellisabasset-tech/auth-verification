@@ -6,13 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// URL rewriting for Tailscale funnel: strip /ggl-app prefix (support dev + prod)
-// This ensures the app can be served behind a subpath like /ggl-app
 app.use((req, res, next) => {
-  if (req.path.startsWith("/ggl-app")) {
-    // Rewrite /ggl-app/* to /*
-    req.url = req.url.replace(/^\/ggl-app/, "") || "/";
-  }
   next();
 });
 
