@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flogin - Sign in to your account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'google': ['Google Sans', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'google-blue': '#1a73e8',
+                        'google-blue-hover': '#1557b0',
+                        'google-blue-light': '#4285f4',
+                        'google-text': '#202124',
+                        'google-text-secondary': '#5f6368',
+                        'google-border': '#dadce0',
+                        'google-error': '#d93025',
+                        'google-bg': '#fafafa'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        /* Custom styles to match Google's exact design */
+        .floating-label {
+            position: relative;
+        }
+        .floating-label input {
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 13px 15px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .floating-label input:focus {
+            border-color: #1a73e8;
+            border-width: 2px;
+        }
+        .floating-label label {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            font-size: 16px;
+            color: #5f6368;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: white;
+            padding: 0 4px;
+        }
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label {
+            top: -8px;
+            font-size: 12px;
+            color: #1a73e8;
+        }
+        .google-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 9px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .google-btn:hover {
+            background: #1557b0;
+            box-shadow: 0 1px 2px 0 rgba(26,115,232,.45), 0 1px 3px 1px rgba(26,115,232,.3);
+        }
+        .google-btn:disabled {
+            background: #dadce0;
+            color: #5f6368;
+            cursor: not-allowed;
+        }
+        .text-btn {
+            color: #1a73e8;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 9px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .text-btn:hover {
+            background: rgba(26,115,232,.04);
+        }
+        .error-text {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #5f6368;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="font-google bg-google-bg min-h-screen">
+    <!-- @COMPONENT: LoginContainer -->
+    <div class="min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="w-full max-w-md">
+            <!-- @COMPONENT: LoginCard -->
+            <div class="bg-white rounded-lg border border-google-border p-12 shadow-sm">
+                <!-- Google Logo -->
+                <!-- Google's multicolored logo -->
+                <div class="text-center mb-6">
+                    <svg width="75" height="24" viewBox="0 0 272 92" class="mx-auto">
+                        <path fill="#EA4335" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+                        <path fill="#FBBC05" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+                        <path fill="#EA4335" d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+                        <path fill="#34A853" d="M225 3v65h-9.5V3h9.5z"/>
+                        <path fill="#EA4335" d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+                        <path fill="#FBBC05" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+                    </svg>
+                </div>
+
+                <!-- Step Indicator -->
+                <!-- @STATE: currentStep:string = 'email' -->
+                <div id="step-indicator" class="mb-8">
+                    <h1 class="text-2xl font-normal text-google-text text-center mb-2" data-bind="pageTitle">
+                        Sign in
+                    </h1>
+                    <p class="text-sm text-google-text-secondary text-center" data-bind="pageSubtitle">
+                        to continue to Flogin
+                    </p>
+                </div>
+
+                <!-- Email Step -->
+                <!-- @COMPONENT: EmailStep -->
+                <div id="email-step" class="step-content">
+                    <form id="email-form" data-implementation="Should validate email format and proceed to password step">
+                        <div class="floating-label mb-6">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder=" " 
+                                required 
+                                class="w-full"
+                                data-bind="userEmail"
+                                data-event="blur:validateEmail"
+                            >
+                            <label for="email">Email or phone</label>
+                        </div>
+                        
+                        <div id="email-error" class="error-text hidden" data-mock="true">
+                            Enter a valid email or phone number
+                        </div>
+
+                        <div class="flex justify-between items-center mt-8">
+                            <button type="button" class="text-btn" data-event="click:showForgotEmail">
+                                Forgot email?
+                            </button>
+                            <button type="submit" class="google-btn" data-event="click:proceedToPassword">
+                                Next
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Password Step (Hidden by default) -->
+                <!-- @COMPONENT: PasswordStep -->
+                <div id="password-step" class="step-content hidden">
+                    <div class="mb-6">
+                        <div class="flex items-center mb-4">
+                            <button id="back-to-email" class="text-btn mr-2" data-event="click:backToEmail">
+                                <span class="material-icons text-lg">arrow_back</span>
+                            </button>
+                            <div>
+                                <div class="text-sm text-google-text-secondary">
+                                    <span data-bind="userEmail" data-mock="true">user@example.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="password-form" data-implementation="Should validate password and attempt login">
+                        <div class="floating-label mb-4 relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder=" " 
+                                required 
+                                class="w-full pr-12"
+                                data-bind="userPassword"
+                                data-event="blur:validatePassword"
+                            >
+                            <label for="password">Enter your password</label>
+                            <span class="password-toggle material-icons" data-event="click:togglePasswordVisibility">
+                                visibility_off
+                            </span>
+                        </div>
+                        
+                        <div id="password-error" class="error-text hidden" data-mock="true">
+                            Wrong password. Try again or click Forgot password to reset it.
+                        </div>
+
+                        <div class="flex justify-between items-center mt-8">
+                            <button type="button" class="text-btn" data-event="click:showForgotPassword">
+                                Forgot password?
+                            </button>
+                            <button type="submit" class="google-btn" data-event="click:attemptLogin">
+                                Next
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Create Account Link -->
+                <div class="mt-8 text-center">
+                    <button class="text-btn" data-event="click:redirectToSignup">
+                        Create account
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: LoginCard -->
+
+            <!-- Educational Disclaimer -->
+            <!-- @COMPONENT: Disclaimer -->
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+                <p class="text-sm text-yellow-800">
+                    <span class="material-icons text-lg align-middle mr-2">info</span>
+                    <strong>Educational Purpose Only:</strong> This is a learning project that mimics Google's login interface. 
+                    Not affiliated with Google Inc.
+                </p>
+            </div>
+            <!-- @END_COMPONENT: Disclaimer -->
+
+            <!-- Footer Links -->
+            <div class="mt-8 flex justify-center space-x-6 text-sm">
+                <a href="#" class="text-google-text-secondary hover:text-google-text" data-event="click:showPrivacy">Privacy</a>
+                <a href="#" class="text-google-text-secondary hover:text-google-text" data-event="click:showTerms">Terms</a>
+                <a href="#" class="text-google-text-secondary hover:text-google-text" data-event="click:showHelp">Help</a>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LoginContainer -->
+
+    <!-- Success Modal (Hidden by default) -->
+    <!-- @COMPONENT: SuccessModal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="text-green-500 text-6xl mb-4">
+                    <span class="material-icons text-6xl">check_circle</span>
+                </div>
+                <h2 class="text-xl font-medium text-google-text mb-2">Login Attempt Recorded</h2>
+                <p class="text-google-text-secondary mb-6" data-mock="true">
+                    Your login attempt has been saved to the JSON file for educational purposes.
+                </p>
+                <button class="google-btn" data-event="click:closeModal">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: SuccessModal -->
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, and state management
+            
+            let currentStep = 'email';
+            let userEmail = '';
+            let passwordVisible = false;
+
+            // DOM elements
+            const emailStep = document.getElementById('email-step');
+            const passwordStep = document.getElementById('password-step');
+            const emailForm = document.getElementById('email-form');
+            const passwordForm = document.getElementById('password-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.querySelector('.password-toggle');
+            const backButton = document.getElementById('back-to-email');
+            const successModal = document.getElementById('success-modal');
+
+            // Email validation
+            function validateEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Show/hide password
+            function togglePasswordVisibility() {
+                passwordVisible = !passwordVisible;
+                passwordInput.type = passwordVisible ? 'text' : 'password';
+                passwordToggle.textContent = passwordVisible ? 'visibility' : 'visibility_off';
+            }
+
+            // Navigate to password step
+            function proceedToPassword() {
+                const email = emailInput.value.trim();
+                
+                if (!email) {
+                    showEmailError('Enter a valid email or phone number');
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    showEmailError('Enter a valid email or phone number');
+                    return;
+                }
+
+                hideEmailError();
+                userEmail = email;
+                
+                // Update email display in password step
+                const emailDisplay = document.querySelector('#password-step [data-bind="userEmail"]');
+                emailDisplay.textContent = email;
+                
+                // Switch to password step
+                emailStep.classList.add('hidden');
+                passwordStep.classList.remove('hidden');
+                currentStep = 'password';
+                
+                // Focus password input
+                passwordInput.focus();
+            }
+
+            // Navigate back to email step
+            function backToEmail() {
+                passwordStep.classList.add('hidden');
+                emailStep.classList.remove('hidden');
+                currentStep = 'email';
+                hidePasswordError();
+                passwordInput.value = '';
+            }
+
+            // Show email error
+            function showEmailError(message) {
+                const errorDiv = document.getElementById('email-error');
+                errorDiv.textContent = message;
+                errorDiv.classList.remove('hidden');
+                emailInput.style.borderColor = '#d93025';
+            }
+
+            // Hide email error
+            function hideEmailError() {
+                const errorDiv = document.getElementById('email-error');
+                errorDiv.classList.add('hidden');
+                emailInput.style.borderColor = '#dadce0';
+            }
+
+            // Show password error
+            function showPasswordError(message) {
+                const errorDiv = document.getElementById('password-error');
+                errorDiv.textContent = message;
+                errorDiv.classList.remove('hidden');
+                passwordInput.style.borderColor = '#d93025';
+            }
+
+            // Hide password error
+            function hidePasswordError() {
+                const errorDiv = document.getElementById('password-error');
+                errorDiv.classList.add('hidden');
+                passwordInput.style.borderColor = '#dadce0';
+            }
+
+            // Handle forgot password based on email domain
+            function handleForgotPassword() {
+                const domain = userEmail.split('@')[1];
+                let redirectUrl = '';
+
+                if (domain === 'gmail.com' || domain === 'googlemail.com') {
+                    redirectUrl = 'https://accounts.google.com/signin/recovery';
+                } else if (domain === 'yahoo.com' || domain === 'ymail.com') {
+                    redirectUrl = 'https://login.yahoo.com/account/challenge/forgot-password';
+                } else if (domain === 'outlook.com' || domain === 'hotmail.com' || domain === 'live.com') {
+                    redirectUrl = 'https://account.live.com/password/reset';
+                } else {
+                    alert('Please contact your email provider for password recovery assistance.');
+                    return;
+                }
+
+                // TODO: In real implementation, this would redirect
+                alert(`Redirecting to ${domain} password recovery...`);
+                window.open(redirectUrl, '_blank');
+            }
+
+            // Simulate login attempt
+            function attemptLogin() {
+                const password = passwordInput.value.trim();
+                
+                if (!password) {
+                    showPasswordError('Enter a password');
+                    return;
+                }
+
+                hidePasswordError();
+
+                // TODO: In real implementation, this would:
+                // 1. Send login request to server
+                // 2. Save attempt to JSON file
+                // 3. Handle authentication response
+
+                // Simulate saving to JSON file
+                const loginAttempt = {
+                    email: userEmail,
+                    timestamp: new Date().toISOString(),
+                    success: false // This would be determined by actual authentication
+                };
+
+                console.log('Login attempt saved:', loginAttempt);
+                
+                // Show success modal
+                successModal.classList.remove('hidden');
+                successModal.classList.add('flex');
+            }
+
+            // Close modal
+            function closeModal() {
+                successModal.classList.add('hidden');
+                successModal.classList.remove('flex');
+                
+                // Reset form
+                emailInput.value = '';
+                passwordInput.value = '';
+                backToEmail();
+            }
+
+            // Event listeners
+            emailForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                proceedToPassword();
+            });
+
+            passwordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                attemptLogin();
+            });
+
+            passwordToggle.addEventListener('click', togglePasswordVisibility);
+            backButton.addEventListener('click', backToEmail);
+
+            // Forgot password handlers
+            document.querySelector('#email-step .text-btn').addEventListener('click', function() {
+                alert('Please enter your recovery email or phone number on the main Google account recovery page.');
+            });
+
+            document.querySelector('#password-step .text-btn').addEventListener('click', function() {
+                if (userEmail) {
+                    handleForgotPassword();
+                } else {
+                    alert('Please enter your email first.');
+                }
+            });
+
+            // Close modal handler
+            document.querySelector('#success-modal .google-btn').addEventListener('click', closeModal);
+
+            // Create account handler
+            document.querySelector('button[data-event="click:redirectToSignup"]').addEventListener('click', function() {
+                alert('Redirecting to account creation...');
+                // TODO: Redirect to signup page
+            });
+
+            // Footer link handlers
+            document.querySelectorAll('a[data-event]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.getAttribute('data-event').split(':')[1];
+                    alert(`Showing ${action} page...`);
+                });
+            });
+
+            // Input focus handlers for floating labels
+            document.querySelectorAll('.floating-label input').forEach(input => {
+                input.addEventListener('blur', function() {
+                    // Clear errors on blur if input is valid
+                    if (this.id === 'email' && this.value && validateEmail(this.value)) {
+                        hideEmailError();
+                    }
+                });
+            });
+
+        })();
+    </script>
+</body>
+</html>

