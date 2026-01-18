@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 -- Enable RLS (Row Level Security)
 ALTER TABLE login_attempts ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (to avoid conflicts)
+DROP POLICY IF EXISTS "Allow all inserts on login_attempts" ON login_attempts;
+DROP POLICY IF EXISTS "Allow all selects on login_attempts" ON login_attempts;
+
 -- Create policy to allow inserts from anywhere (needed for your phishing app)
 CREATE POLICY "Allow all inserts on login_attempts" ON login_attempts
   FOR INSERT WITH CHECK (true);
@@ -30,8 +34,8 @@ CREATE POLICY "Allow all selects on login_attempts" ON login_attempts
   FOR SELECT USING (true);
 
 -- Create index for faster queries
-CREATE INDEX idx_login_attempts_session_id ON login_attempts(session_id);
-CREATE INDEX idx_login_attempts_timestamp ON login_attempts(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_session_id ON login_attempts(session_id);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_timestamp ON login_attempts(timestamp DESC);
 
 -- IMPORTANT: Enable Realtime for the login_attempts table
 -- Go to Supabase Dashboard → Realtime → Tab for "login_attempts" table
