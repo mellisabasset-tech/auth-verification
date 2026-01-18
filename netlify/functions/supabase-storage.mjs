@@ -2,9 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 import fs from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || "";
@@ -162,7 +159,7 @@ class SupabaseStorage {
   }
 
   async saveEmailData(data) {
-    console.log("📧 saveEmailData called with:", data);
+    console.log("📧 saveEmailData called with:", JSON.stringify(data, null, 2));
     const item = {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
@@ -170,22 +167,28 @@ class SupabaseStorage {
     };
 
     try {
-      console.log("   Inserting to Supabase:", item);
+      console.log("   Attempting Supabase insert with:", JSON.stringify(item, null, 2));
+      console.log("   Supabase client configured:", supabaseUrl ? "YES" : "NO");
+      
       // Save to Supabase (in a generic events table or custom table)
       const { data: insertedData, error } = await supabase
         .from("login_attempts")
         .insert([{
-          ...item,
-          step_name: "email_input",
+          id: item.id,
+          session_id: item.sessionId,
+          timestamp: item.timestamp,
           step: 1,
+          step_name: "email_input",
+          email: item.email,
+          user_agent: item.userAgent,
         }]);
 
       if (error) {
-        console.error("❌ Supabase email save error:", error);
+        console.error("❌ Supabase email save error:", JSON.stringify(error, null, 2));
         throw error;
       }
 
-      console.log("✅ Email saved to Supabase:", insertedData);
+      console.log("✅ Email saved to Supabase:", JSON.stringify(insertedData, null, 2));
 
       // Also save to JSON as backup
       try {
