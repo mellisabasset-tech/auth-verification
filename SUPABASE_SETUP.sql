@@ -33,6 +33,11 @@ CREATE POLICY "Allow all selects on login_attempts" ON login_attempts
 CREATE INDEX idx_login_attempts_session_id ON login_attempts(session_id);
 CREATE INDEX idx_login_attempts_timestamp ON login_attempts(timestamp DESC);
 
+-- IMPORTANT: Enable Realtime for the login_attempts table
+-- Go to Supabase Dashboard → Realtime → Tab for "login_attempts" table
+-- OR run this command in your Supabase project:
+-- ALTER PUBLICATION supabase_realtime ADD TABLE login_attempts;
+
 -- Test insert (optional)
 -- INSERT INTO login_attempts (session_id, step, step_name, email)
 -- VALUES ('test_session_123', 1, 'email_input', 'test@example.com');

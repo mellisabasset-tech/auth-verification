@@ -3,7 +3,7 @@ import { insertLoginAttemptSchema } from "../../shared/schema";
 import { z } from "zod";
 import type { Handler } from "@netlify/functions";
 
-const handler: Handler = async (event, context) => {
+const handler: Handler = async (event, _context) => {
   try {
     if (event.httpMethod === "POST") {
       const body = JSON.parse(event.body || "{}");

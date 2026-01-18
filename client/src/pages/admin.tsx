@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,14 +7,58 @@ import { Trash2, RefreshCw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import type { LoginAttempt } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase client for real-time subscriptions
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const subscriptionRef = useRef<any>(null);
 
   const { data: attempts = [], isLoading, refetch } = useQuery<LoginAttempt[]>({
     queryKey: ['/api/login-attempts'],
   });
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!supabase) {
+      console.warn("Supabase not configured for real-time updates");
+      return;
+    }
+
+    // Subscribe to login_attempts table
+    subscriptionRef.current = supabase
+      .channel('login_attempts_changes')
+      .on('postgres_changes', 
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'login_attempts'
+        },
+        (payload: any) => {
+          // Auto-refresh data when changes detected
+          queryClient.invalidateQueries({ queryKey: ['/api/login-attempts'] });
+          
+          // Show toast notification
+          toast({
+            title: "New login attempt",
+            description: `Step ${payload.new?.step} - ${payload.new?.stepName?.replace('_', ' ')}`,
+          });
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+      }
+    };
+  }, [queryClient, toast]);
 
   const clearAttemptsMutation = useMutation({
     mutationFn: async () => {
